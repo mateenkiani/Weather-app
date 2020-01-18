@@ -1,20 +1,55 @@
 import 'package:flutter/material.dart';
+import './Theming/ThemeManager.dart';
+import 'package:provider/provider.dart';
+import './services/StorageManager.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  StorageManager.readData('themeMode').then((value) {
+    var themeMode = value ?? 'light';
+    return runApp(
+      ChangeNotifierProvider<ThemeNotifier>(
+        create: (_) => new ThemeNotifier(themeMode),
+        lazy: false,
+        child: MyApp(),
+      ),
+    );
+  });
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Colors.orange),
-      child: Text(
-        'Hello World',
-        textDirection: TextDirection.ltr,
-        style: TextStyle(
-          fontSize: 32,
-          color: Colors.black87,
-        ),
+    return Consumer<ThemeNotifier>(
+      builder: (_, theme, __) => WidgetsApp(
+        color: theme.getTheme().backgroundColor,
+        builder: (context, int) {
+          return Container(
+              color: theme.getTheme().backgroundColor,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    RaisedButton(
+                      color: theme.getTheme().secondaryHeaderColor,
+                      child: Text(
+                        'set Dark',
+                        textDirection: TextDirection.ltr,
+                      ),
+                      onPressed: () => theme.setDarkMode(),
+                    ),
+                    RaisedButton(
+                      color: Colors.blueGrey,
+                      child: Text(
+                        'set Light',
+                        textDirection: TextDirection.ltr,
+                      ),
+                      onPressed: () => theme.setLightMode(),
+                    )
+                  ],
+                ),
+              ));
+        },
       ),
     );
   }
