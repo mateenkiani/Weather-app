@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/StorageManager.dart';
+import '../services/storage_manager.dart';
 
 class ThemeNotifier with ChangeNotifier {
   final darkTheme = ThemeData(
