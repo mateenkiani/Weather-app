@@ -8,8 +8,7 @@ Future<LocationData> getLocation() async {
     currentLocation = await location.getLocation();
   } on PlatformException catch (e) {
     if (e.code == 'PERMISSION_DENIED') {
-      var error = 'Permission denied';
-      print(error);
+      print('Permission denied');
     }
     currentLocation = null;
   }

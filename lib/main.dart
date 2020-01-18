@@ -1,52 +1,29 @@
 import 'package:flutter/material.dart';
+import './theming/theme_manager.dart';
+import 'package:provider/provider.dart';
+import './services/storage_manager.dart';
+import './routes.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  StorageManager.readData('themeMode').then((value) {
+    var themeMode = value ?? 'light';
+    return runApp(
+      ChangeNotifierProvider<ThemeNotifier>(
+        create: (_) => new ThemeNotifier(themeMode),
+        child: MyApp(),
+      ),
+    );
+  });
+}
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var theme = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
-      title: 'Weather App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Home'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            RaisedButton(
-              color: Colors.blueAccent,
-              onPressed: () => setState(() {
-                print("you have clicked the button");
-              }),
-              child: Text('Click Me'),
-            ),
-          ],
-        ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      theme: theme.getTheme(),
+      home: HomePage(),
     );
   }
 }
