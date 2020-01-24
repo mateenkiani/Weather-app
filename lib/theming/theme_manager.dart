@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
 import '../services/storage_manager.dart';
 
-class ThemeNotifier with ChangeNotifier {
+class MyTheme {
+  ThemeData materialTheme;
+  Color primary;
+  Color secondary;
+
+  MyTheme(String themeMode)
+  {
+    if (themeMode == 'light'){
+      this.materialTheme = lightTheme;
+      this.primary = Colors.white;
+      this.secondary = Colors.grey;
+    } else {
+      this.materialTheme = darkTheme;
+      this.primary = Colors.grey;
+      this.secondary = Colors.black;
+    }
+  }
+
   final darkTheme = ThemeData(
     primarySwatch: Colors.grey,
     primaryColor: Colors.black,
@@ -21,9 +38,14 @@ class ThemeNotifier with ChangeNotifier {
     accentIconTheme: IconThemeData(color: Colors.white),
     dividerColor: Colors.white54,
   );
+}
 
-  ThemeData _themeData;
-  ThemeData getTheme() => _themeData;
+class ThemeNotifier with ChangeNotifier {
+  final lightTheme = MyTheme('light');
+  final darkTheme = MyTheme('dark');
+
+  MyTheme _themeData; 
+  MyTheme getTheme() => _themeData;
 
   ThemeNotifier(String themeMode) {
     if (themeMode == 'light') {
@@ -35,13 +57,13 @@ class ThemeNotifier with ChangeNotifier {
 
   void setDarkMode() async {
     _themeData = darkTheme;
-    StorageManager.saveData('themeMode','dark');
+    StorageManager.saveData('themeMode', 'dark');
     notifyListeners();
   }
 
   void setLightMode() async {
     _themeData = lightTheme;
-    StorageManager.saveData('themeMode','light');
+    StorageManager.saveData('themeMode', 'light');
     notifyListeners();
   }
 }

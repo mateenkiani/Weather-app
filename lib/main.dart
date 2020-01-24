@@ -22,7 +22,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var theme = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
-      theme: theme.getTheme(),
+      debugShowCheckedModeBanner: false,
+      theme: theme.getTheme().materialTheme,
       home: HomePage(),
     );
   }
