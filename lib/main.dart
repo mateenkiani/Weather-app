@@ -20,10 +20,10 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    var theme = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: theme.getTheme().materialTheme,
+      theme: ThemeData(fontFamily: 'SofiaPro'),
+      color: Colors.white,
       home: HomePage(),
     );
   }

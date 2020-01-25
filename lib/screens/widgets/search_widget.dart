@@ -3,25 +3,54 @@ import 'package:provider/provider.dart';
 import 'package:weather_app/theming/theme_manager.dart';
 
 class Search extends StatefulWidget {
+  Search({Key key}) : super(key: key);
   @override
-  _Search createState() => _Search();
+  SearchState createState() => SearchState();
 }
 
-class _Search extends State<Search> {
-  FocusNode myFocusNode;
-  TextEditingController myController;
+class SearchState extends State<Search> {
+  FocusNode _myFocusNode;
+  TextEditingController _myController;
+  double _width;
+  bool _isVisible;
+
+  void showSearchBar() {
+    print('functin called');
+    setState(() {
+      _isVisible = true;
+    });
+    Future.delayed(const Duration(milliseconds: 10), () {
+      setState(() {
+        _width = MediaQuery.of(context).size.width - 10;
+      });
+    });
+  }
+
+  void hideSearchBar() {
+    print('functin called');
+    setState(() {
+      _width = 100;
+    });
+    Future.delayed(const Duration(milliseconds: 50), () {
+      setState(() {
+        _isVisible = false;
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    myFocusNode = FocusNode();
-    myController = new TextEditingController();
+    _width = 100;
+    _isVisible = false;
+    _myFocusNode = FocusNode();
+    _myController = new TextEditingController();
   }
 
   @override
   void dispose() {
-    myFocusNode.dispose();
-    myController.dispose();
+    _myFocusNode.dispose();
+    _myController.dispose();
     super.dispose();
   }
 
@@ -29,43 +58,54 @@ class _Search extends State<Search> {
   Widget build(BuildContext context) {
     var theme = Provider.of<ThemeNotifier>(context);
 
-    return Container(
-      margin: EdgeInsets.only(top: 30, left: 10, right: 10),
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 7.0,
-            spreadRadius: 1.0,
-            color: theme.getTheme().materialTheme.primaryColor,
+    return Visibility(
+      visible: _isVisible,
+      child: Positioned(
+        top: 35,
+        right: 5,
+        child: AnimatedContainer(
+          curve: Curves.decelerate,
+          duration: Duration(milliseconds: 50),
+          width: _width,
+          height: 50,
+          decoration: BoxDecoration(
+            color: theme.getTheme().primaryColor,
           ),
-        ],
-        borderRadius: BorderRadius.circular(10),
-        color: theme.getTheme().materialTheme.buttonColor,
-      ),
-      padding: EdgeInsets.all(10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          InkWell(
-              onTap: () => Scaffold.of(context).openDrawer(),
-              child: Icon(Icons.menu)),
-          Expanded(
-            child: TextField(
-              focusNode: myFocusNode,
-              controller: myController,
-              onEditingComplete: () =>
-                  editingComplete(context, myFocusNode, myController),
-              decoration: InputDecoration(
-                  contentPadding: EdgeInsets.only(left: 15, right: 15),
-                  hintText: "Search City",
-                  filled: false,
-                  border: InputBorder.none),
+          child: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                IconButton(
+                    color: theme.getTheme().primaryTextColor,
+                    onPressed: () {
+                      hideSearchBar();
+                    },
+                    icon: Icon(Icons.close)),
+                Expanded(
+                  child: TextField(
+                    focusNode: _myFocusNode,
+                    controller: _myController,
+                    onEditingComplete: () =>
+                        editingComplete(context, _myFocusNode, _myController),
+                    decoration: InputDecoration(
+                        fillColor: theme.getTheme().primaryTextColor,
+                        hintStyle:
+                            TextStyle(color: theme.getTheme().primaryColor),
+                        contentPadding: EdgeInsets.only(left: 15, right: 15),
+                        hintText: "Search City",
+                        filled: true,
+                        border: InputBorder.none),
+                  ),
+                ),
+                IconButton(
+                    color: theme.getTheme().primaryTextColor,
+                    onPressed: () =>
+                        editingComplete(context, _myFocusNode, _myController),
+                    icon: Icon(Icons.location_on)),
+              ],
             ),
           ),
-          InkWell(
-              onTap: () => editingComplete(context, myFocusNode, myController),
-              child: Icon(Icons.search)),
-        ],
+        ),
       ),
     );
   }
