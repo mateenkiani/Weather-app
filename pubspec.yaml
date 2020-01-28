@@ -76,4 +76,10 @@ flutter:
   fonts:
     - family: SofiaPro
       fonts:
-        - asset: fonts/SofiaProRegular.ttf
+        - asset: fonts/SofiaPro-Regular.ttf
+    - family: SofiaProLight
+      fonts:
+        - asset: fonts/SofiaPro-Light.ttf
+    - family: SofiaProExtraLight
+      fonts:
+        - asset: fonts/SofiaPro-ExtraLight.ttf

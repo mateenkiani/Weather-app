@@ -3,25 +3,28 @@ import 'package:provider/provider.dart';
 import 'package:weather_app/theming/theme_manager.dart';
 
 class Search extends StatefulWidget {
-  Search({Key key}) : super(key: key);
+  final MyCallBack callBack;
+  Search({Key key, this.callBack}) : super(key: key);
   @override
   SearchState createState() => SearchState();
 }
 
 class SearchState extends State<Search> {
-  FocusNode _myFocusNode;
-  TextEditingController _myController;
-  double _width;
-  bool _isVisible;
+  FocusNode myFocusNode;
+  TextEditingController myController;
+  double width;
+  bool searchBarVisibility;
+  bool locationWidgetVisibility;
 
   void showSearchBar() {
     print('functin called');
     setState(() {
-      _isVisible = true;
+      searchBarVisibility = true;
     });
     Future.delayed(const Duration(milliseconds: 10), () {
       setState(() {
-        _width = MediaQuery.of(context).size.width - 10;
+        width = MediaQuery.of(context).size.width - 10;
+        widget.callBack(0.0);
       });
     });
   }
@@ -29,11 +32,12 @@ class SearchState extends State<Search> {
   void hideSearchBar() {
     print('functin called');
     setState(() {
-      _width = 100;
+      width = 100;
     });
     Future.delayed(const Duration(milliseconds: 50), () {
       setState(() {
-        _isVisible = false;
+        searchBarVisibility = false;
+        widget.callBack(1.0);
       });
     });
   }
@@ -41,17 +45,31 @@ class SearchState extends State<Search> {
   @override
   void initState() {
     super.initState();
-    _width = 100;
-    _isVisible = false;
-    _myFocusNode = FocusNode();
-    _myController = new TextEditingController();
+    width = 100;
+    searchBarVisibility = false;
+    locationWidgetVisibility = false;
+    myFocusNode = FocusNode();
+    myController = new TextEditingController();
+    myFocusNode.addListener(focusChanged);
   }
 
   @override
   void dispose() {
-    _myFocusNode.dispose();
-    _myController.dispose();
+    myFocusNode.dispose();
+    myController.dispose();
     super.dispose();
+  }
+
+  void focusChanged() {
+    if (myFocusNode.hasFocus) {
+      setState(() {
+        locationWidgetVisibility = true;
+      });
+    } else {
+      setState(() {
+        locationWidgetVisibility = false;
+      });
+    }
   }
 
   @override
@@ -59,60 +77,106 @@ class SearchState extends State<Search> {
     var theme = Provider.of<ThemeNotifier>(context);
 
     return Visibility(
-      visible: _isVisible,
+      visible: searchBarVisibility,
       child: Positioned(
         top: 35,
         right: 5,
-        child: AnimatedContainer(
-          curve: Curves.decelerate,
-          duration: Duration(milliseconds: 50),
-          width: _width,
-          height: 50,
-          decoration: BoxDecoration(
-            color: theme.getTheme().primaryColor,
-          ),
-          child: Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                IconButton(
-                    color: theme.getTheme().primaryTextColor,
-                    onPressed: () {
-                      hideSearchBar();
-                    },
-                    icon: Icon(Icons.close)),
-                Expanded(
-                  child: TextField(
-                    focusNode: _myFocusNode,
-                    controller: _myController,
-                    onEditingComplete: () =>
-                        editingComplete(context, _myFocusNode, _myController),
-                    decoration: InputDecoration(
-                        fillColor: theme.getTheme().primaryTextColor,
-                        hintStyle:
-                            TextStyle(color: theme.getTheme().primaryColor),
-                        contentPadding: EdgeInsets.only(left: 15, right: 15),
-                        hintText: "Search City",
-                        filled: true,
-                        border: InputBorder.none),
-                  ),
+        child: Column(
+          children: <Widget>[
+            AnimatedContainer(
+              curve: Curves.decelerate,
+              duration: Duration(milliseconds: 50),
+              width: width,
+              height: 50,
+              decoration: BoxDecoration(
+                color: theme.getTheme().primaryColor,
+              ),
+              child: Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.close),
+                      splashColor: Colors.red,
+                      onPressed: () {
+                        resetField();
+                        hideSearchBar();
+                      },
+                      color: theme.getTheme().primaryTextColor,
+                    ),
+                    Expanded(
+                      child: TextField(
+                        style: TextStyle(
+                            color: theme.getTheme().secondaryTextColor),
+                        focusNode: myFocusNode,
+                        controller: myController,
+                        onEditingComplete: () => editingComplete(),
+                        decoration: InputDecoration(
+                            fillColor: theme.getTheme().primaryTextColor,
+                            hintStyle:
+                                TextStyle(color: theme.getTheme().primaryColor),
+                            contentPadding:
+                                EdgeInsets.only(left: 15, right: 15),
+                            hintText: "Search City",
+                            filled: true,
+                            border: InputBorder.none),
+                      ),
+                    ),
+                    IconButton(
+                        splashColor: theme
+                            .getTheme()
+                            .secondaryTextColor
+                            .withOpacity(0.2),
+                        color: theme.getTheme().primaryTextColor,
+                        onPressed: () => editingComplete(),
+                        icon: Icon(Icons.location_on)),
+                  ],
                 ),
-                IconButton(
-                    color: theme.getTheme().primaryTextColor,
-                    onPressed: () =>
-                        editingComplete(context, _myFocusNode, _myController),
-                    icon: Icon(Icons.location_on)),
-              ],
+              ),
             ),
-          ),
+            Visibility(
+              visible: locationWidgetVisibility,
+              child: Container(
+                height: 50,
+                margin: EdgeInsets.only(left: 30, right: 30, top: 5),
+                padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                color: theme.getTheme().secondaryColor,
+                width: MediaQuery.of(context).size.width - 105,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Icon(
+                      Icons.location_searching,
+                      color: theme.getTheme().secondaryTextColor,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Text(
+                        'Use Current Location',
+                        style: TextStyle(
+                          color: theme.getTheme().secondaryTextColor,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );
   }
 
-  void editingComplete(
-      BuildContext context, FocusNode node, TextEditingController controller) {
-    controller.clear();
+  void editingComplete() {
+    myController.clear();
+    FocusScope.of(context).unfocus();
+  }
+
+  void resetField() {
+    myController.clear();
     FocusScope.of(context).unfocus();
   }
 }
+
+typedef MyCallBack = void Function(double);

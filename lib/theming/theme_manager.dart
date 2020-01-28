@@ -11,13 +11,13 @@ class MyTheme {
     if (themeMode == 'light') {
       this.primaryColor = Color.fromRGBO(241, 251, 255, 1.0);
       this.primaryTextColor = Color.fromRGBO(30, 0, 62, 1.0);
-      this.secondaryTextColor = Color.fromRGBO(30, 0, 62, 5.0);
-      this.secondaryColor = Colors.grey;
+      this.secondaryTextColor = Color.fromRGBO(241, 251, 255, 1.0);
+      this.secondaryColor = Color.fromRGBO(30, 0, 62, 1.0);
     } else {
       this.primaryColor = Color.fromRGBO(30, 0, 62, 1.0);
       this.primaryTextColor = Color.fromRGBO(241, 251, 255, 1.0);
-      this.secondaryTextColor = Color.fromRGBO(241, 251, 255, 5.0);
-      this.secondaryColor = Colors.black;
+      this.secondaryTextColor = Color.fromRGBO(30, 0, 62, 1.0);
+      this.secondaryColor = Color.fromRGBO(241, 251, 255, 1.0);
     }
   }
 }
